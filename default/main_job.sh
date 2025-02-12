@@ -12,6 +12,18 @@
 #SBATCH --export=ALL
 #SBATCH --signal=B:USR1@180
 
+
+function email (){
+    #email an update
+    echo -e "Subject: ${SLURM_JOB_NAME}_${SLURM_JOB_ID}\n${SLURM_JOB_NAME}_${SLURM_JOB_ID} geometrey optimization and nmr params have started!\n"  > mail_${SLURM_JOB_ID}.txt
+    echo -e  $1 >> mail_${SLURM_JOB_ID}.txt
+    squeue -u your_username >> mail_${SLURM_JOB_ID}.txt
+    wait
+    curl -s --ssl-reqd   --url 'smtps://smtp.gmail.com:465'   --user 'your_email:Password' \
+    --mail-from 'test'   --mail-rcpt 'your_email'   --upload-file mail_${SLURM_JOB_ID}.txt
+    rm mail_${SLURM_JOB_ID}.txt
+}
+
 # Create new scratch directory and add a variable for the new directory name
 NEW_DIR="/expanse/lustre/scratch/${USER}/temp_project/castep/${SLURM_JOB_NAME}_${SLURM_JOB_ID}"
 DATA="/home/${USER}/project/${SLURM_JOB_NAME}/"
